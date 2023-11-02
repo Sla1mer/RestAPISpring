@@ -5,36 +5,35 @@ import com.example.buysell.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+import java.util.List;
+
+@RestController
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
 
-    @GetMapping("/")
-    public String products(Model model) {
-        model.addAttribute("products", productService.listProducts());
-        return "products";
+    @GetMapping("/products")
+    public List<Product> products() {
+       return productService.listProducts();
     }
 
-    @GetMapping("/product/{id}")
-    public String productInfo(@PathVariable Long id, Model model) {
-        model.addAttribute("product", productService.getProductById(id));
-        return "product-info";
+    @GetMapping("/products/{id}")
+    public Product productInfo(@PathVariable Long id) {
+        return productService.getProductById(id);
     }
 
-    @PostMapping("/product/create")
-    public String createProduct(Product product) {
-        productService.saveProduct(product);
-        return "redirect:/";
+    @PostMapping("/products/create")
+    public Product createProduct(@RequestBody Product product) {
+        return productService.SaveProduct(product);
     }
-
-    @PostMapping("/product/delete/{id}")
-    public String deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
-        return "redirect:/";
+    @DeleteMapping("/products/delete/{id}")
+    public Product deleteProduct(@PathVariable Long id) {
+        return productService.DeleteProduct(id);
+    }
+    @PutMapping("/products/update/{id}")
+    public Product updateProduct(@RequestBody Product product,@PathVariable Long id){
+        return productService.UpdateProduct(product,id);
     }
 }

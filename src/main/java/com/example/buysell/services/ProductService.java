@@ -2,35 +2,50 @@ package com.example.buysell.services;
 
 
 import com.example.buysell.models.Product;
+import com.example.buysell.repository.ProductRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.stereotype.Service;
 
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class ProductService {
-    private List<Product> products = new ArrayList<>();
-    private long ID = 0;
-
+    private final ProductRepository productRepository;
+    public List<Product> listProducts()
     {
-        products.add(new Product(++ID, "PlayStation 5", "Simple description", 67000, "Krasnoyarsk", "tomas"));
-        products.add(new Product(++ID, "Iphone 8", "Simple description", 24000, "Moscow", "artmcoder"));
+        return productRepository.findAll();
     }
-
-    public List<Product> listProducts() { return products; }
-
-    public void saveProduct(Product product) {
-        product.setId(++ID);
-        products.add(product);
+    public Product getProductById(Long id){
+        return productRepository.findById(id).orElse(null);
     }
-
-    public void deleteProduct(Long id) {
-        products.removeIf(product -> product.getId().equals(id));
+    public Product SaveProduct(Product product){
+        productRepository.save(product);
+        return product;
     }
-
-    public Product getProductById(Long id) {
-        for (Product product : products) {
-            if (product.getId().equals(id)) return product;
+    public Product DeleteProduct(Long id){
+        Product product=productRepository.findById(id).orElse(null);
+        if(product!=null){
+            productRepository.deleteById(id);
+            return product;
+        }
+        return null;
+    }
+    public Product UpdateProduct(Product productData, Long id){
+        Product product=productRepository.findById(id).orElse(null);
+        if(product!=null){
+            product.setAuthor(productData.getAuthor());
+            product.setCity(productData.getCity());
+            product.setTitle(productData.getTitle());
+            product.setDescription(productData.getDescription());
+            product.setPrice(productData.getPrice());
+            productRepository.save(product);
+            return product;
         }
         return null;
     }
