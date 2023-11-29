@@ -2,6 +2,7 @@ package com.example.buysell.services;
 
 import com.example.buysell.models.db.ProductsMove;
 import com.example.buysell.models.db.Receiver;
+import com.example.buysell.models.db.Storage;
 import com.example.buysell.repository.ProductsMoveRepository;
 import com.example.buysell.repository.ReceiverRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,37 @@ public class ReceiverService {
         }
 
         return totalReceivedAmountByReceiver;
+    }
+
+    public List<Receiver> listReceiver()
+    {
+        return receiverRepository.findAll();
+    }
+    public Receiver getReceiverById(Long id){
+        return receiverRepository.findById(id).orElse(null);
+    }
+    public Receiver SaveReceiver(Receiver receiver){
+        receiverRepository.save(receiver);
+        return receiver;
+    }
+    public Receiver DeleteReceiver(Long id){
+        Receiver receiver=receiverRepository.findById(id).orElse(null);
+        if(receiver!=null){
+            receiverRepository.deleteById(id);
+            return receiver;
+        }
+        return null;
+    }
+    public Receiver UpdateReceiver(Receiver receiverData, Long id){
+        Receiver receiver=receiverRepository.findById(id).orElse(null);
+        if(receiver!=null){
+            receiver.setAddress(receiverData.getAddress());
+            receiver.setName(receiver.getName());
+            receiver.setSurname(receiver.getSurname());
+
+            return receiver;
+        }
+        return null;
     }
 
 }
