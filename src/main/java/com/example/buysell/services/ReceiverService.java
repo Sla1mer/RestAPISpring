@@ -1,0 +1,48 @@
+package com.example.buysell.services;
+
+import com.example.buysell.models.db.ProductsMove;
+import com.example.buysell.models.db.Receiver;
+import com.example.buysell.repository.ProductsMoveRepository;
+import com.example.buysell.repository.ReceiverRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class ReceiverService {
+
+    private final ReceiverRepository receiverRepository;
+    private final ProductsMoveRepository productsMoveRepository;
+
+    @Autowired
+    public ReceiverService(ReceiverRepository receiverRepository, ProductsMoveRepository productsMoveRepository) {
+        this.receiverRepository = receiverRepository;
+        this.productsMoveRepository = productsMoveRepository;
+    }
+
+    public List<Receiver> getAllReceivers() {
+        return receiverRepository.findAll();
+    }
+
+    public Map<Receiver, Double> calculateTotalReceivedAmountByReceiver() {
+        List<Receiver> receivers = receiverRepository.findAll();
+        Map<Receiver, Double> totalReceivedAmountByReceiver = new HashMap<>();
+
+        for (Receiver receiver : receivers) {
+            List<ProductsMove> movesForReceiver = productsMoveRepository.findByReceiver(receiver);
+
+            double totalReceivedAmount = movesForReceiver.stream()
+                    .filter(move -> "поступление".equalsIgnoreCase(move.getMoveType())) // Фильтрация только поступлений
+                    .mapToDouble(ProductsMove::getQuantity)
+                    .sum();
+
+            totalReceivedAmountByReceiver.put(receiver, totalReceivedAmount);
+        }
+
+        return totalReceivedAmountByReceiver;
+    }
+
+}
